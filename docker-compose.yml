@@ -1,0 +1,93 @@
+version: '3'
+services: 
+  main:
+    image: spider_main
+    ports:
+      - "5005:5000"
+    depends_on:
+      - mongodb
+      - redis
+    links:
+      - mongodb:db
+      - redis:rd
+    volumes:
+      - ~/scrapy/spider_master:/spider_master
+    environment:
+      - DB_NAME=db
+      - RD_NAME=rd
+    command: python /spider_master/administor/start.py
+  iaga_slave:
+    image: spider_iaga
+    depends_on:
+      - rabbitmq
+      - mongodb
+      - redis
+    links:
+      - mongodb:db
+      - rabbitmq:rq
+      - redis:rd
+    volumes:
+      - ~/scrapy/spider_slave/iaga_slave:/iaga_slave
+    environment:
+      - DB_NAME=db
+      - RQ_NAME=rq
+      - RD_NAME=rd
+    command: python main.py 
+  istp_slave:
+    image: spider_istp
+    depends_on:
+      - rabbitmq
+      - mongodb
+      - redis
+    links:
+      - mongodb:db
+      - rabbitmq:rq
+      - redis:rd
+    volumes:
+      - ~/scrapy/spider_slave/istp_slave:/istp_slave
+    environment:
+      - DB_NAME=db
+      - RQ_NAME=rq
+      - RD_NAME=rd
+    command: python main.py
+  mongodb:
+    image: mongo:zn
+    ports:
+      - 27019:27017
+    volumes:
+      - ~/scrapy_data:/mongodb/data
+  rabbitmq:
+    image: test_rabbitmq
+ #   volumes:
+#      - ~/rabbitmq_data:/data
+    ports:
+      - 5675:5672
+      - 15675:15672
+  redis:
+    image: redis
+    volumes:
+      - ~/redis_data/79-80:/data
+      - ~/redis_data/79-80/redis.conf:/usr/local/bin/redis.conf
+    ports:
+      - 6380:6379
+    command: redis-server /usr/local/bin/redis.conf
+  redis_slave1:
+    image: redis
+    volumes:
+      - ~/redis_data/79-81:/data
+      - ~/redis_data/79-81/redis.conf:/usr/local/bin/redis.conf
+    ports:
+      - 6381:6379
+    command: redis-server /usr/local/bin/redis.conf
+  redis_slave2:
+    image: redis
+    volumes:
+      - ~/redis_data/79-82:/data
+      - ~/redis_data/79-82/redis.conf:/usr/local/bin/redis.conf
+    ports:
+      - 6382:6379
+    command: redis-server /usr/local/bin/redis.conf
+
+
+    
+

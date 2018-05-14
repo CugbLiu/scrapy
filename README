@@ -1,0 +1,27 @@
+# 由于redis的主从复制是写入配置文件的，所以在更改服务器的ip地址时，需要重新配
+# 置redis_data下的三个配置文件
+
+# spider_main中的myConfigure_params.py需要更改mongodb的端口，redis的端口，以及访问远程html的file_url
+
+# 以后最好不要将挂载信息放置在~目录下，因为这样不同的用户的~代表的目录是不同的
+
+# 端口映射与挂载信息
+	# spider_main 5005:5000
+		# ~/scrapy/spider_master:/spider_master  代码存放位置
+	# spider_iaga
+		# ~/scrapy/spider_slave/iaga_slave:/iaga_slave 代码存放位置
+	# spider_istp
+		# ~/scrapy/spider_slave/istp_slave:/istp_slave 代码存放位置
+	# mongodb 27019:27017
+		# ~/scrapy_data:/mongodb/data moongodb的数据存放位置
+	# rabbitmq 5675:5672 15675:15672
+		# 无，暂且还未实现消息信息的挂载
+	# redis 6380:6379
+		# ~/redis_data/79-80:/data  redis的数据持久化(dump)的存放位置
+		# ~/redis_data/79-80/redis.conf:/usr/local/bin/redis.conf #因为将主从复制更改至配置文件中，所以需要挂载一个配置文件
+	# redis_slave1 6381:6379
+		# ~/redis_data/79-81:/data
+		# ~/redis_data/79-81/redis.conf:/usr/local/bin/redis.conf
+	# redis_slave2 6382:6379
+		# ~/redis_data/79-82:/data
+		# ~/redis_data/79-82/redis.conf:/usr/local/bin/redis.conf 
